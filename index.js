@@ -1,4 +1,3 @@
-// Infraestrutura Oficial do Trabalho (25 Vértices)
 const pesos = {
   0: 0, 1: 5, 2: 7, 3: 2, 4: 4, 5: 10, 6: 5, 7: 3, 8: 8, 9: 1, 10: 9, 
   11: 9, 12: 6, 13: 4, 14: 2, 15: 7, 16: 1, 17: 4, 18: 1, 19: 5, 20: 10, 
@@ -33,33 +32,30 @@ const mapa = {
   24: [{ destino: 18, distancia: 194 }, { destino: 0, distancia: 275 }, { destino: 23, distancia: 224 }, { destino: 20, distancia: 271 }]
 };
 
-// Função principal que recebe os parâmetros D e K
 function testarRobo(limiteBateria, alcanceCamera) {
   const verticesVisitados = [];
   let melhorPontuacao = 0;
   let melhorCaminho = [];
+  let distanciaGasta = 0;
   
   function dfs(vertice, bateriaAtual, pontuacaoAtual, fotosTiradas) {
     verticesVisitados.push(vertice);
     
-    // Tira foto do chão onde pisou
     if (!fotosTiradas.includes(vertice)) {
       fotosTiradas.push(vertice);
       pontuacaoAtual = pontuacaoAtual + pesos[vertice];
     }
     
-    // Se voltou ao 0, guarda e encerra esta viagem
     if (vertice == 0 && verticesVisitados.length > 1) {
       if (pontuacaoAtual > melhorPontuacao) {
         melhorPontuacao = pontuacaoAtual;
         melhorCaminho = [...verticesVisitados];
+        distanciaGasta = limiteBateria - bateriaAtual;
       }
     } 
-    // Se não, continua a explorar o mapa
     else {
       const vizinhos = mapa[vertice];
       
-      // Tira fotos à distância
       for (const vizinho of vizinhos) {
         if (vizinho.distancia <= alcanceCamera && !fotosTiradas.includes(vizinho.destino)) {
           fotosTiradas.push(vizinho.destino);
@@ -67,7 +63,6 @@ function testarRobo(limiteBateria, alcanceCamera) {
         }
       }
       
-      // Caminha para o próximo vértice
       for (const vizinho of vizinhos) {
         if (
           (!verticesVisitados.includes(vizinho.destino) || vizinho.destino == 0) &&
@@ -81,17 +76,15 @@ function testarRobo(limiteBateria, alcanceCamera) {
     verticesVisitados.pop();
   }
 
-  // Inicia a viagem
   dfs(0, limiteBateria, pesos[0], [0]);
 
-  console.log(`\nTeste com Bateria (D) = ${limiteBateria} e Câmera (K) = ${alcanceCamera}`);
+  console.log(`\n--- Teste com Bateria (D) = ${limiteBateria} e Câmera (K) = ${alcanceCamera} ---`);
   console.log("Melhor Caminho Encontrado: ", melhorCaminho.join(" -> "));
+  console.log("Distância Total Percorrida: ", distanciaGasta, "cm");
   console.log("Maior Pontuação: ", melhorPontuacao);
 }
 
-// 1. Executa o teste padrão do trabalho
-testarRobo(7000, 200);
-
-// 2. Executa o teste com aumento para análise do relatório
-testarRobo(7000, 250); 
-testarRobo(5500, 200);
+// Execução dos testes
+testarRobo(7000, 200);  // Cenário base
+testarRobo(10000, 200); // Aumento exclusivo da bateria (D)
+testarRobo(10000, 300); // Aumento de bateria (D) e câmera (K)
